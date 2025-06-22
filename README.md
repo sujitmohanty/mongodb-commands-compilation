@@ -6,7 +6,6 @@
 
 ```mongodb
 use libraryApp
-switched to db libraryApp
 
 db.createCollection("books")
 
