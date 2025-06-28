@@ -256,3 +256,45 @@ db.samples.insertOne({
 ```bash
 mongo -u siteAdmin -p securePass --authenticationDatabase admin
 ```
+
+## 📝 Phonebook App
+
+```javascript
+function populatePhonebook(areaCode, quantity) {
+  for (var i = 0; i < quantity; i++) {
+    var phoneNumberLength = 3 + ((Math.random() * 6) << 0);
+    var phoneNumber =
+      1 + ((Math.random() * Math.pow(10, phoneNumberLength)) << 0);
+    phoneNumberLength = 1 + Math.floor(Math.log(phoneNumber) / Math.log(10));
+    if (phoneNumberLength < 3) continue;
+
+    var num = areaCode * Math.pow(10, phoneNumberLength) + phoneNumber;
+
+    db.phones.insertOne({
+      _id: num,
+      components: {
+        areaCode: areaCode,
+        phoneNumber: phoneNumber,
+      },
+      display: areaCode + "/" + phoneNumber,
+    });
+  }
+}
+```
+
+```javascript
+load("phonebook.js");
+populatePhonebook(9281, 10);
+db.phones.find().pretty();
+```
+
+### Phone search queries
+
+```mongodb
+db.phones.createIndex({ display: 1 }, { unique: true })
+db.phones.find({ display: /070/ })
+db.phones.find({ display: /070$/ })
+db.phones.find({ display: /\/201/ })
+db.phones.find({ display: /\/[246]00/ })
+db.phones.find({ display: /\/20(.*)13$/ })
+```
