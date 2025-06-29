@@ -368,7 +368,7 @@ loadCountryIPv4.php
 
 ---
 
-## 📘 Digital Library + User Management System
+# 📘 Digital Library + User Management System
 
 ---
 
@@ -627,7 +627,7 @@ mongo -u siteAdmin -p securePass --authenticationDatabase admin
 
 ---
 
-## 📝 Phonebook App
+# 📘 Phonebook App
 
 ```javascript
 function populatePhonebook(areaCode, quantity) {
@@ -667,8 +667,4 @@ db.phones.find({ display: /070$/ })
 db.phones.find({ display: /\/201/ })
 db.phones.find({ display: /\/[246]00/ })
 db.phones.find({ display: /\/20(.*)13$/ })
-```
-
-```mongodb
-use libraryApp
 ```
