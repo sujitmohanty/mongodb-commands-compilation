@@ -368,7 +368,7 @@ loadCountryIPv4.php
 
 ---
 
-## Digital Library + User Management System
+## 📘 Digital Library + User Management System
 
 ---
 
@@ -658,7 +658,7 @@ populatePhonebook(9281, 10);
 db.phones.find().pretty();
 ```
 
-### Phone search queries
+### 📝 Phone search queries
 
 ```mongodb
 db.phones.createIndex({ display: 1 }, { unique: true })
