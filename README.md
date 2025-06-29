@@ -1,159 +1,370 @@
 # 📘 MongoDB Commands Compilation
 
-## 1. 📦 Installation and Setup
+1. Start MongoDB service
 
-1. `sudo systemctl start mongod`  
-   _Start the MongoDB service_
-2. `sudo systemctl stop mongod`  
-   _Stop the MongoDB service_
-3. `sudo systemctl status mongod`  
-   _Check MongoDB service status_
-4. `sudo systemctl restart mongod`  
-   _Restart the MongoDB service_
-5. `sudo systemctl enable mongod`  
-   _Enable MongoDB to start on boot_
+```mongodb
+sudo systemctl start mongod
+```
 
-## 2. 🗃️ Database Operations (DDL)
+2. Stop MongoDB service
 
-6. `use DATABASE_NAME`  
-   _Select or create a new database_
-7. `db`  
-   _Show the current database_
-8. `show dbs`  
-   _List all databases_
-9. `db.dropDatabase()`  
-   _Drop the current database_
+```mongodb
+sudo systemctl stop mongod
+```
 
-## 3. 📂 Collection Operations
+3. Check MongoDB service status
 
-10. `db.createCollection("mycol", { capped: true, size: 6142800, max: 10000 })`  
-    _Create a capped collection_
-11. `db.COLLECTION_NAME.drop()`  
-    _Drop a collection_
+```mongodb
+sudo systemctl status mongod
+```
 
-## 4. 🧾 Insert Documents (DML)
+4. Restart MongoDB service
 
-12. `db.COLLECTION_NAME.insertOne(document)`  
-    _Insert a single document_
-13. `db.COLLECTION_NAME.insertMany([doc1, doc2, ...])`  
-    _Insert multiple documents_
-14. `db.COLLECTION_NAME.replaceOne(filter, document)`  
-    _Replace a document completely_
+```mongodb
+sudo systemctl restart mongod
+```
 
-## 5. 🔍 Query Documents
+5. Enable MongoDB on boot
 
-15. `db.COLLECTION_NAME.find()`  
-    _Find all documents_
-16. `db.COLLECTION_NAME.find().pretty()`  
-    _Find and pretty print output_
-17. `db.COLLECTION_NAME.find({key: value})`  
-    _Find documents matching a key_
-18. `db.COLLECTION_NAME.find({key: {$lt: value}})`  
-    _Less than condition_
-19. `db.COLLECTION_NAME.find({key: {$lte: value}})`  
-    _Less than or equal_
-20. `db.COLLECTION_NAME.find({key: {$gt: value}})`  
-    _Greater than condition_
-21. `db.COLLECTION_NAME.find({key: {$gte: value}})`  
-    _Greater than or equal_
-22. `db.COLLECTION_NAME.find({key: {$ne: value}})`  
-    _Not equal condition_
-23. `db.COLLECTION_NAME.find({key1: val1, key2: val2})`  
-    _AND condition_
-24. `db.COLLECTION_NAME.find({$or: [{key1: val1}, {key2: val2}]})`  
-    _OR condition_
-25. `db.COLLECTION_NAME.find({}, {field1: 1, field2: 1, _id: 0})`  
-    _Projection query_
-26. `db.COLLECTION_NAME.find().limit(N)`  
-    _Limit results_
-27. `db.COLLECTION_NAME.find().skip(N)`  
-    _Skip first N documents_
-28. `db.COLLECTION_NAME.find().sort({field: 1})`  
-    _Sort ascending (1), descending (-1)_
+```mongodb
+sudo systemctl enable mongod
+```
 
-## 6. ✏️ Update Documents
+6. Select or create database
 
-29. `db.COLLECTION_NAME.update(query, updateObj)`  
-    _Update single document (Mongo v3)_
-30. `db.COLLECTION_NAME.update(query, updateObj, {multi: true})`  
-    _Update multiple documents (Mongo v3)_
-31. `db.COLLECTION_NAME.updateOne(query, updateObj)`  
-    _Update one (Mongo v6)_
-32. `db.COLLECTION_NAME.updateMany(query, updateObj)`  
-    _Update many (Mongo v6)_
-33. `db.COLLECTION_NAME.findOneAndUpdate(filter, update)`  
-    _Update one and return pre-update doc_
+```mongodb
+use DATABASE_NAME
+```
 
-## 7. 🔁 Replace Documents
+7. Show current database
 
-34. `db.COLLECTION_NAME.findOneAndReplace(filter, replacement)`  
-    _Replace a document_
+```mongodb
+db
+```
 
-## 8. ❌ Delete Documents
+8. List all databases
 
-35. `db.COLLECTION_NAME.deleteOne(filter)`  
-    _Delete one document_
-36. `db.COLLECTION_NAME.deleteMany(filter)`  
-    _Delete multiple documents_
+```mongodb
+show dbs
+```
 
-## 9. 🔐 User & Role Management
+9. Drop current database
 
-37. `db.createUser({...})`  
-    _Create a new user with roles_
-38. `mongo -u username -p password database`  
-    _Authenticate as user_
-39. `db.getUser("username")`  
-    _View user info_
-40. `db.getRole("role", {showPrivileges:true})`  
-    _View role privileges_
-41. `db.grantRolesToUser("user", [{role: "role", db: "db"}])`  
-    _Grant a role to a user_
-42. `db.revokeRolesFromUser("user", [{role: "role", db: "db"}])`  
-    _Revoke role from user_
-43. `db.changeUserPassword("username", "newPassword")`  
-    _Change user password_
+```mongodb
+db.dropDatabase()
+```
 
-## 10. 📑 Indexes
+10. Create capped collection
 
-44. `db.COLLECTION_NAME.ensureIndex({field: 1})`  
-    _Create ascending index (deprecated)_
-45. `db.COLLECTION_NAME.createIndex({field: 1}, {options})`  
-    _Create index with options_
-46. `db.COLLECTION_NAME.getIndexes()`  
-    _List all indexes_
+```mongodb
+db.createCollection("mycol", { capped: true, size: 6142800, max: 10000 })
+```
 
-## 11. 🔎 Explain Plan & Profiling
+11. Drop collection
 
-47. `db.COLLECTION_NAME.find(query).explain("executionStats")`  
-    _Analyze query performance_
-48. `db.setProfilingLevel(2)`  
-    _Enable full profiling_
-49. `db.system.profile.find()`  
-    _Read profiling results_
+```mongodb
+db.COLLECTION_NAME.drop()
+```
 
-## 12. 📜 Text Search with Regex (Phonebook Examples)
+12. Insert one document
 
-50. `db.phones.find({display:/070/})`  
-    _Contains sequence_
-51. `db.phones.find({display:/070$/})`  
-    _Ends with sequence_
-52. `db.phones.find({display:/^070/})`  
-    _Starts with sequence_
-53. `db.phones.find({display:/\/[246]00/})`  
-    _Starts with digit sets_
-54. `db.phones.find({display:/\/20(.*)13$/})`  
-    _Start and end pattern_
+```mongodb
+db.COLLECTION_NAME.insertOne(document)
+```
 
-## 13. 📤 Backup & Restore
+13. Insert many documents
 
-55. `mongodump --db mydb --collection mycol --out path`  
-    _Backup a collection_
-56. `mongorestore --db mydb --collection mycol path`  
-    _Restore from backup_
-57. `mongodump [options]`  
-    _General format for backup_
-58. `mongorestore [options]`  
-    _General format for restore_
+```mongodb
+db.COLLECTION_NAME.insertMany([doc1, doc2, ...])
+```
+
+14. Replace document
+
+```mongodb
+db.COLLECTION_NAME.replaceOne(filter, document)
+```
+
+15. Find all documents
+
+```mongodb
+db.COLLECTION_NAME.find()
+```
+
+16. Pretty print find result
+
+```mongodb
+db.COLLECTION_NAME.find().pretty()
+```
+
+17. Find with condition
+
+```mongodb
+db.COLLECTION_NAME.find({key: value})
+```
+
+18. Find less than
+
+```mongodb
+db.COLLECTION_NAME.find({key: {$lt: value}})
+```
+
+19. Find less than or equal
+
+```mongodb
+db.COLLECTION_NAME.find({key: {$lte: value}})
+```
+
+20. Find greater than
+
+```mongodb
+db.COLLECTION_NAME.find({key: {$gt: value}})
+```
+
+21. Find greater than or equal
+
+```mongodb
+db.COLLECTION_NAME.find({key: {$gte: value}})
+```
+
+22. Find not equal
+
+```mongodb
+db.COLLECTION_NAME.find({key: {$ne: value}})
+```
+
+23. Find with AND condition
+
+```mongodb
+db.COLLECTION_NAME.find({key1: val1, key2: val2})
+```
+
+24. Find with OR condition
+
+```mongodb
+db.COLLECTION_NAME.find({$or: [{key1: val1}, {key2: val2}]})
+```
+
+25. Projection query
+
+```mongodb
+db.COLLECTION_NAME.find({}, {field1: 1, field2: 1, _id: 0})
+```
+
+26. Limit result count
+
+```mongodb
+db.COLLECTION_NAME.find().limit(N)
+```
+
+27. Skip documents
+
+```mongodb
+db.COLLECTION_NAME.find().skip(N)
+```
+
+28. Sort result
+
+```mongodb
+db.COLLECTION_NAME.find().sort({field: 1})
+```
+
+29. Update one document (v3)
+
+```mongodb
+db.COLLECTION_NAME.update(query, updateObj)
+```
+
+30. Update many documents (v3)
+
+```mongodb
+db.COLLECTION_NAME.update(query, updateObj, {multi: true})
+```
+
+31. Update one document (v6)
+
+```mongodb
+db.COLLECTION_NAME.updateOne(query, updateObj)
+```
+
+32. Update many documents (v6)
+
+```mongodb
+db.COLLECTION_NAME.updateMany(query, updateObj)
+```
+
+33. Find one and update
+
+```mongodb
+db.COLLECTION_NAME.findOneAndUpdate(filter, update)
+```
+
+34. Find one and replace
+
+```mongodb
+db.COLLECTION_NAME.findOneAndReplace(filter, replacement)
+```
+
+35. Delete one document
+
+```mongodb
+db.COLLECTION_NAME.deleteOne(filter)
+```
+
+36. Delete many documents
+
+```mongodb
+db.COLLECTION_NAME.deleteMany(filter)
+```
+
+37. Create user
+
+```mongodb
+db.createUser({...})
+```
+
+38. Authenticate user
+
+```mongodb
+mongo -u username -p password database
+```
+
+39. Get user info
+
+```mongodb
+db.getUser("username")
+```
+
+40. Get role privileges
+
+```mongodb
+db.getRole("role", {showPrivileges:true})
+```
+
+41. Grant role to user
+
+```mongodb
+db.grantRolesToUser("user", [{role: "role", db: "db"}])
+```
+
+42. Revoke role from user
+
+```mongodb
+db.revokeRolesFromUser("user", [{role: "role", db: "db"}])
+```
+
+43. Change user password
+
+```mongodb
+db.changeUserPassword("username", "newPassword")
+```
+
+44. Create index (deprecated)
+
+```mongodb
+db.COLLECTION_NAME.ensureIndex({field: 1})
+```
+
+45. Create index with options
+
+```mongodb
+db.COLLECTION_NAME.createIndex({field: 1}, {options})
+```
+
+46. List all indexes
+
+```mongodb
+db.COLLECTION_NAME.getIndexes()
+```
+
+47. Explain query performance
+
+```mongodb
+db.COLLECTION_NAME.find(query).explain("executionStats")
+```
+
+48. Enable profiling
+
+```mongodb
+db.setProfilingLevel(2)
+```
+
+49. Read profiling results
+
+```mongodb
+db.system.profile.find()
+```
+
+50. Regex - contains sequence
+
+```mongodb
+db.phones.find({display:/070/})
+```
+
+51. Regex - ends with sequence
+
+```mongodb
+db.phones.find({display:/070$/})
+```
+
+52. Regex - starts with sequence
+
+```mongodb
+db.phones.find({display:/^070/})
+```
+
+53. Regex - starts with digit sets
+
+```mongodb
+db.phones.find({display:/\/\[246\]00/})
+```
+
+54. Regex - start and end match
+
+```mongodb
+db.phones.find({display:/\/20(.*)13$/})
+```
+
+55. mongodump basic
+
+```mongodb
+mongodump --db mydb --collection mycol --out path
+```
+
+56. mongorestore basic
+
+```mongodb
+mongorestore --db mydb --collection mycol path
+```
+
+57. mongodump with options
+
+```mongodb
+mongodump [options]
+```
+
+58. mongorestore with options
+
+```mongodb
+mongorestore [options]
+```
+
+59. JavaScript function: insertCustomer
+
+```mongodb
+function insertCustomer(...) {...}
+```
+
+60. Load JS file
+
+```mongodb
+load("insertCustomer.js")
+```
+
+61. PHP CSV import script
+
+```mongodb
+loadCountryIPv4.php
+```
 
 ---
 
