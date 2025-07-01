@@ -1,32 +1,38 @@
 # 📘 MongoDB Commands Compilation
 
+0. Importing a CSV
+
+```bash
+.\mongoimport --db testDB --collection customers --type csv --headerline --file "D:\Users\Sujit\Downloads\test.csv"
+```
+
 1. Start MongoDB service
 
-```mongodb
+```bash
 sudo systemctl start mongod
 ```
 
 2. Stop MongoDB service
 
-```mongodb
+```bash
 sudo systemctl stop mongod
 ```
 
 3. Check MongoDB service status
 
-```mongodb
+```bash
 sudo systemctl status mongod
 ```
 
 4. Restart MongoDB service
 
-```mongodb
+```bash
 sudo systemctl restart mongod
 ```
 
 5. Enable MongoDB on boot
 
-```mongodb
+```bash
 sudo systemctl enable mongod
 ```
 
