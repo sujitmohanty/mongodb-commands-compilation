@@ -637,40 +637,303 @@ mongo -u siteAdmin -p securePass --authenticationDatabase admin
 
 ```javascript
 function populatePhonebook(areaCode, quantity) {
-  for (var i = 0; i < quantity; i++) {
-    var phoneNumberLength = 3 + ((Math.random() * 6) << 0);
-    var phoneNumber =
-      1 + ((Math.random() * Math.pow(10, phoneNumberLength)) << 0);
-    phoneNumberLength = 1 + Math.floor(Math.log(phoneNumber) / Math.log(10));
-    if (phoneNumberLength < 3) continue;
+  const inserted = new Set();
+  let attempts = 0;
 
-    var num = areaCode * Math.pow(10, phoneNumberLength) + phoneNumber;
+  while (inserted.size < quantity && attempts < quantity * 10) {
+    attempts++;
 
-    db.phones.insertOne({
-      _id: num,
-      components: {
-        areaCode: areaCode,
-        phoneNumber: phoneNumber,
-      },
-      display: areaCode + "/" + phoneNumber,
-    });
+    // Generate random 6-digit local number (000000–999999)
+    const local = Math.floor(100000 + Math.random() * 900000);
+    const display = `${areaCode}/${local}`;
+    const id = parseInt(`${areaCode}${local}`); // Create numeric ID like 70200123
+
+    if (inserted.has(id)) continue;
+
+    try {
+      db.phones.insertOne({
+        _id: id,
+        components: {
+          areaCode: areaCode,
+          localNumber: local,
+        },
+        display: display, // Example: "070/201013"
+      });
+      inserted.add(id);
+    } catch (e) {
+      if (e.code === 11000) continue; // Duplicate, try again
+      else throw e;
+    }
   }
+
+  print(`✅ Inserted ${inserted.size} phone numbers for area code ${areaCode}`);
 }
 ```
 
-```javascript
-load("phonebook.js");
-populatePhonebook(9281, 10);
-db.phones.find().pretty();
+# 📞 MongoDB Phonebook Index & Regex Queries
+
+```bash
+mongosh
 ```
 
-### 📝 Phone search queries
+## 📦 Switch Database
 
 ```mongodb
-db.phones.createIndex({ display: 1 }, { unique: true })
-db.phones.find({ display: /070/ })
-db.phones.find({ display: /070$/ })
-db.phones.find({ display: /\/201/ })
-db.phones.find({ display: /\/[246]00/ })
-db.phones.find({ display: /\/20(.*)13$/ })
+use phonebookDB
 ```
+
+## 📦 Create Index
+
+Ensure fast searches and uniqueness on the `display` field:
+
+```mongodb
+db.phones.createIndex({ display: 1 }, { unique: true });
+```
+
+---
+
+## 🔍 Regex Queries on `display`
+
+### 1. Match any display value containing `"070"`
+
+```mongodb
+db.phones.find({ display: /070/ });
+```
+
+### 2. Match display values ending with `"070"`
+
+```mongodb
+db.phones.find({ display: /070$/ });
+```
+
+### 3. Match local numbers starting with `"201"` (after slash)
+
+```mongodb
+db.phones.find({ display: /\/201/ });
+```
+
+### 4. Match local numbers ending in `"200"`, `"400"`, or `"600"`
+
+```mongodb
+db.phones.find({ display: /\/[246]00/ });
+```
+
+### 5. Match numbers starting with `"20"` and ending with `"13"`
+
+```mongodb
+db.phones.find({ display: /\/20(.*)13$/ });
+```
+
+---
+
+# 📞 Customer Support Ticketing System (MongoDB Shell Script)
+
+This project demonstrates how to build a basic **Customer Support Ticketing System** using only the MongoDB shell. It showcases insertions, queries, updates, regex, user management, indexing, and backups.
+
+---
+
+## 🗂️ 1. Setup Database and Collections
+
+```mongodb
+use supportApp;
+
+db.createCollection("tickets");
+db.createCollection("users");
+```
+
+---
+
+## 👥 2. Insert Sample Users
+
+```mongodb
+db.users.insertMany([
+  { username: "agent1", role: "agent", email: "agent1@example.com" },
+  { username: "cust1", role: "customer", email: "cust1@example.com" }
+]);
+```
+
+---
+
+## 🎟️ 3. Insert Sample Tickets
+
+```mongodb
+db.tickets.insertMany([
+  {
+    customerId: "cust1",
+    issue: "App crashes on login",
+    status: "open",
+    createdAt: new Date(),
+    priority: 3,
+    tags: ["crash", "login"]
+  },
+  {
+    customerId: "cust1",
+    issue: "Cannot reset password",
+    status: "open",
+    createdAt: new Date(),
+    priority: 2,
+    tags: ["password", "support"]
+  }
+]);
+```
+
+---
+
+## 🔍 4. Basic Queries
+
+```mongodb
+db.tickets.find().pretty();
+db.tickets.find({ status: "open" });
+db.tickets.find({ priority: { $gte: 2 } });
+```
+
+---
+
+## 📊 5. Pagination, Projection, and Sorting
+
+```mongodb
+db.tickets.find({}, { issue: 1, _id: 0 }).sort({ priority: -1 }).skip(0).limit(5);
+```
+
+---
+
+## 🧠 6. Compound and Conditional Queries
+
+```mongodb
+db.tickets.find({
+  $or: [
+    { status: "open" },
+    { tags: "password" }
+  ]
+});
+```
+
+---
+
+## 🔧 7. Update Tickets
+
+```mongodb
+db.tickets.updateOne(
+  { issue: "App crashes on login" },
+  { $set: { status: "in-progress", updatedAt: new Date() } }
+);
+
+db.tickets.updateOne(
+  { issue: "App crashes on login" },
+  { $push: { tags: "urgent" } }
+);
+```
+
+---
+
+## 🔁 8. Replace Ticket
+
+```mongodb
+db.tickets.replaceOne(
+  { issue: "Cannot reset password" },
+  {
+    customerId: "cust1",
+    issue: "Password reset fails",
+    status: "open",
+    createdAt: new Date(),
+    priority: 3,
+    tags: ["password"]
+  }
+);
+```
+
+---
+
+## ❌ 9. Delete Tickets
+
+```mongodb
+db.tickets.deleteMany({ priority: { $lt: 2 } });
+```
+
+---
+
+## 🔐 10. User Authentication Setup
+
+```mongodb
+use admin;
+db.createUser({
+  user: "supportAdmin",
+  pwd: "securePass",
+  roles: [{ role: "userAdminAnyDatabase", db: "admin" }]
+});
+db.auth("supportAdmin", "securePass");
+
+use supportApp;
+db.createUser({
+  user: "agent1",
+  pwd: "agentPass",
+  roles: ["readWrite"]
+});
+db.createUser({
+  user: "cust1",
+  pwd: "custPass",
+  roles: ["read"]
+});
+```
+
+---
+
+## 🔎 11. Create Indexes
+
+```mongodb
+db.tickets.createIndex({ status: 1 });
+db.tickets.createIndex({ customerId: 1 });
+db.tickets.createIndex({ issue: "text" });
+db.tickets.getIndexes();
+```
+
+---
+
+## 🔤 12. Regex Search Examples
+
+```mongodb
+db.tickets.find({ issue: /password/i });
+db.tickets.find({ issue: /^App/ });
+db.tickets.find({ issue: /login$/ });
+```
+
+---
+
+## 🛠️ 13. JavaScript Function for Test Data
+
+```mongodb
+function insertTicket(customerId, issue, priority = 2) {
+  db.tickets.insertOne({
+    customerId: customerId,
+    issue: issue,
+    status: "open",
+    createdAt: new Date(),
+    priority: priority,
+    tags: []
+  });
+}
+
+insertTicket("cust1", "App freezes intermittently", 4);
+```
+
+---
+
+## 💾 14. Backup and Restore (Shell Commands)
+
+> These are external shell commands, not part of the script itself.
+
+```bash
+mongodump -u supportAdmin -p securePass --authenticationDatabase admin -d supportApp -o ./backup
+mongorestore -u supportAdmin -p securePass --authenticationDatabase admin ./backup
+```
+
+---
+
+## 📈 15. Enable Profiling
+
+```mongodb
+db.setProfilingLevel(2);
+db.system.profile.find().pretty();
+```
+
+---
